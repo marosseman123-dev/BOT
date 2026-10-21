@@ -1,0 +1,9 @@
+# Unified bot deps. Reuses ../seo_audit and ../EmailHunterV2/hunter in place.
+# httpx (pure-Python) is used instead of aiohttp: aiohttp's C extensions crash
+# with an access violation on CPython 3.14. httpx runs 143k+ domains stably there.
+httpx>=0.27            # async HTTP client (single-crawl fetch)
+brotli>=1.1            # decode 'br'-encoded pages (Cloudflare/nginx) instead of failing
+beautifulsoup4>=4.12   # HTML parsing (seo_audit + classifier)
+lxml>=5.0              # fast parser backend
+pandas>=2.0            # CSV chunked read
+certifi>=2024.1.1

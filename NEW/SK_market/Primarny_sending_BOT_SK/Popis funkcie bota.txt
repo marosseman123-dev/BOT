@@ -1,0 +1,275 @@
+Toto je interný manuál k tvojmu skriptu, napísaný tak, aby ho pochopili aj kolegovia, ktorí ho budú používať alebo upravovať.
+
+Čo tento bot robí
+Tento Python skript je automatizovaný emailový nástroj na hromadné odosielanie personalizovaných emailov z CSV súboru.
+
+Podporuje dva režimy:
+
+Web na prenájom (jedna univerzálna šablóna)
+
+Kampane C1–C6 (viacero marketingových šablón podľa typu auditu)
+
+Bot:
+
+načíta dáta z CSV (domény, emaily, kampane…)
+
+vygeneruje personalizovaný email cez HTML šablónu (Jinja2)
+
+odošle email cez SMTP
+
+uloží odoslaný email do IMAP „Sent“
+
+loguje výsledky (CSV + HTML)
+
+udržiava stav (aby vedel pokračovať kde skončil)
+
+dodržiava rate limit (anti-spam ochrana)
+
+Hlavné časti systému
+1. Vstupné dáta (CSV)
+Súbor:
+
+audit_results_2026_marketing_v4_1.csv
+
+Používané stĺpce:
+
+domain → doména klienta
+
+emails → zoznam emailov (môže byť viac)
+
+campaign → C1–C6 (iba pre campaign režim)
+
+personalized_details_html → HTML zoznam problémov
+
+Ak email chýba:
+
+bot použije fallback: owner@domain
+
+Max:
+
+5 emailov na doménu
+
+2. Režimy bota
+Po spustení si vyberieš:
+
+1 → Web na prenájom
+
+používa: web-na-prenajom-email.html
+
+fixný subject
+
+jednoduchá personalizácia (len DOMAIN)
+
+2 → Kampane C1–C6
+
+používa: template_c1.html … template_c6.html
+
+každá doména má priradenú kampaň
+
+obsahuje audit (problémy webu)
+
+3. Šablóny (Jinja2)
+Používa sa Jinja2 templating.
+
+Premenné v šablónach:
+
+DOMAIN
+
+PERSONALIZED_DETAILS_HTML
+
+BLUE_URL
+
+BLUE_LABEL
+
+YEAR
+
+Príklad:
+{{ DOMAIN }}
+
+Bot automaticky:
+
+oreže zoznam problémov na max 5
+
+zvýrazní názvy problémov (bold)
+
+4. Odosielanie emailov
+SMTP:
+
+smtp.hostcreators.sk:465 (SSL)
+
+IMAP:
+
+ukladanie do "Sent"
+
+Každý email:
+
+má HTML aj plain-text verziu
+
+má unikátne Message-ID
+
+má nastavený Reply-To
+
+Retry logika:
+
+3 pokusy pri výpadku spojenia
+
+5. Rate limiting (veľmi dôležité)
+Bot má ochranu proti spamu:
+
+max 199 emailov za 59 minút
+
+minimálne 20 sekúnd medzi emailami
+
+Ak server vráti chyby:
+
+421, 450, 451, 454
+→ bot sa zastaví a uloží stav
+
+6. Stav (resume mechanizmus)
+Súbory:
+
+bot_state.json
+
+bot_state_wnp.json
+
+Ukladá:
+
+posledný spracovaný riadok
+
+počet odoslaných emailov v okne
+
+čas začiatku okna
+
+Výhoda:
+→ môžeš bot kedykoľvek stopnúť a znova spustiť bez duplicít
+
+7. Logovanie
+Súbory:
+
+send_log.csv
+
+send_log.html
+
+Obsah:
+
+index
+
+domain
+
+email
+
+status (OK / FAILED)
+
+error
+
+timestamp
+
+message_id
+
+HTML log:
+→ prehľadná tabuľka na otvorenie v browseri
+
+Testovací režim
+Pred ostrým posielaním:
+
+bot sa spýta, či chceš poslať test
+
+odošle 1 email na:
+maros.seman@azet.sk
+
+Pre kampane:
+
+vyberieš C1–C6
+
+Obsah testu:
+
+fake audit data
+
+Ako spustiť
+Priprav CSV
+
+Skontroluj šablóny (HTML súbory)
+
+Spusti:
+
+python sending_bot.py
+
+Vyber režim
+
+(voliteľne) test email
+
+potvrď ostré posielanie
+
+Ako bot spracováva dáta
+Pre každý riadok:
+
+Načíta doménu
+
+Extrahuje emaily (regex)
+
+Vyberie šablónu
+
+Vygeneruje HTML
+
+Počká (rate limit)
+
+Odošle email
+
+Zapíše log
+
+Uloží state
+
+Ochrany a edge cases
+Bot rieši:
+
+duplicitné emaily → deduplikácia
+
+chýbajúce emaily → fallback
+
+prerušenie → resume
+
+SMTP chyby → retry
+
+rate limit → stop + save state
+
+poškodený log/state → safe fallback
+
+Dôležité nastavenia (hore v kóde)
+ACTIVE_CAMPAIGNS
+→ môžeš obmedziť len na konkrétne kampane (napr. {"C1", "C3"})
+
+TEST_RECIPIENT
+→ kam ide test
+
+GLOBAL_BLUE_URL
+→ CTA link
+
+Na čo si dať pozor
+Nezvyšuj rýchlosť (risk blacklistu)
+
+Skontroluj CSV encoding (utf-8-sig)
+
+Over SMTP login (inak FAIL)
+
+IMAP musí podporovať append (Sent)
+
+Praktický príklad
+CSV riadok:
+
+domain: example.sk
+
+emails: info@example.sk, admin@example.sk
+
+campaign: C2
+
+Bot:
+
+vyberie template_c2.html
+
+vloží audit
+
+odošle max 2 emaily
+
+zapíše do logu
+
+pokračuje ďalej

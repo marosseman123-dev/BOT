@@ -1,0 +1,18 @@
+{
+  "maros": {
+    "email_user": "name@example.com",
+    "email_pass": "DOPLN_LOKALNE",
+    "from_name": "Meno odosielatela",
+    "from_addr": "name@example.com",
+    "reply_to": "name@example.com",
+    "sender_title": "",
+    "sender_phone": "",
+    "smtp_host": "smtp.example.com",
+    "smtp_port": 465,
+    "imap_host": "imap.example.com",
+    "imap_port": 993,
+    "imap_sent_folder": "Sent",
+    "emails_per_hour_default": 20,
+    "emails_per_hour_max": 20
+  }
+}
