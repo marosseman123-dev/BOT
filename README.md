@@ -12,8 +12,12 @@ Tento repozitár obsahuje publikovateľnú kópiu botov z `D:\BOT\NEW` k 21. 10.
 
 Niektoré pôvodné skripty majú pevne zadané názvy lokálnych CSV a šablón. Repozitár zachováva ich fungujúcu logiku, ale po klonovaní treba dodať príslušné vstupy a overiť konfiguráciu pred prvým odoslaním. Nepúšťaj produkčný odosielací režim iba na skúšku inštalácie.
 
+**Známe obmedzenie pôvodných zdrojov:** `NEW/BEST_email_seo_cleaner_segentation_BOT` a `NEW/CZ_market/BEST_email_seo_cleaner_segentation_BOT` odkazujú na lokálne moduly `seo_audit` a `EmailHunterV2`, ktoré v týchto dvoch pôvodných priečinkoch nie sú. Tieto dve varianty preto po samotnom klonovaní nie sú kompletné. SK a PL varianty tieto moduly obsahujú.
+
 ## Kontrola bez odosielania
 
 `python -m compileall -q NEW` overí syntax. Testy sú najmä v `NEW/SK_market/BEST_email_seo_cleaner_segentation_BOT/tests`, `NEW/PL_market/BEST_email_seo_cleaner_segentation_BOT/tests` a pri SK Webnaprenajom botovi. Tieto testy spúšťaj až po inštalácii závislostí príslušného bota.
+
+Pri príprave repozitára prešlo 43 testov SK Webnaprenajom bota. Samokontrolné skripty `unibot.selfcheck` pri SK a PL variante zlyhali na existujúcich testových očakávaniach; ostrý zber a odosielanie sa nespúšťali.
 
 Lokálne pôvodné súbory v `D:\BOT\NEW` neboli pri príprave repozitára upravené. Kód publikovaný tu číta heslá z prostredia a neobsahuje pôvodné vložené heslá.
